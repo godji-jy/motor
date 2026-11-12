@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ESP32 Motor RPM Control · Infographic</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EAF1F3;--surface:#fff;--ink:#12262E;--muted:#51666E;--line:#B9CBD1;
+--teal:#0E7C86;--teal-soft:#D3EEF0;--amber:#B97A00;--amber-soft:#FBEBC4;--coral:#C0412B;--coral-soft:#F9DDD6;--violet:#5B4BB5;--violet-soft:#E3DFF7;--chip:#12262E;--chip-ink:#EAF1F3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1D22;--surface:#16292F;--ink:#E4EFF2;--muted:#9DB3BA;--line:#34505A;
+--teal:#4CC3CD;--teal-soft:#16393E;--amber:#F0B33C;--amber-soft:#3B2E10;--coral:#F08A74;--coral-soft:#42201A;--violet:#A99BEF;--violet-soft:#2A2550;--chip:#0A1519;--chip-ink:#E4EFF2;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1D22;--surface:#16292F;--ink:#E4EFF2;--muted:#9DB3BA;--line:#34505A;
+--teal:#4CC3CD;--teal-soft:#16393E;--amber:#F0B33C;--amber-soft:#3B2E10;--coral:#F08A74;--coral-soft:#42201A;--violet:#A99BEF;--violet-soft:#2A2550;--chip:#0A1519;--chip-ink:#E4EFF2;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Thai","Noto Sans Thai",Tahoma,sans-serif;line-height:1.6}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 16px 56px}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.2;margin:0 0 8px}
+h2{font-size:22px;margin:0 0 2px}
+.lead{color:var(--muted);margin:0 0 18px}
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:22px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 16px}
+.stat b{display:block;font-size:24px;color:var(--teal);line-height:1.2}
+.stat span{font-size:13px;color:var(--muted)}
+section{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px}
+.sub{color:var(--muted);margin:0 0 12px;font-size:15px}
+.scroll{overflow-x:auto}
+svg.fig{display:block;width:100%;height:auto;min-width:640px}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;background:var(--bg);padding:1px 6px;border-radius:5px;font-size:.92em}
+/* svg styles */
+.bx{fill:var(--bg);stroke:var(--line);stroke-width:1.5}
+.tl{fill:var(--teal-soft);stroke:var(--teal);stroke-width:2}
+.am{fill:var(--amber-soft);stroke:var(--amber);stroke-width:2}
+.vi{fill:var(--violet-soft);stroke:var(--violet);stroke-width:2}
+.co{fill:var(--coral-soft);stroke:var(--coral);stroke-width:2}
+.dk{fill:var(--chip);stroke:var(--chip)}
+.pin{fill:var(--muted)}
+.tx{font-size:16px;font-weight:700;fill:var(--ink)}
+.sm{font-size:13px;fill:var(--muted)}
+.dtx{fill:var(--chip-ink)}
+.ln{stroke:var(--muted);stroke-width:2;fill:none;marker-end:url(#ar)}
+.ln2{stroke:var(--violet);stroke-width:2;fill:none;marker-end:url(#ar);marker-start:url(#arb)}
+.dash{stroke-dasharray:6 5}
+.wave{stroke:var(--teal);stroke-width:3;fill:none}
+.num{fill:var(--teal)}
+.numt{fill:var(--bg);font-weight:700;font-size:15px;text-anchor:middle}
+.mid{text-anchor:middle}
+.spin{transform-box:fill-box;transform-origin:center;animation:sp 2.5s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.flow{stroke-dasharray:8 8;animation:fl 1.2s linear infinite}
+@keyframes fl{to{stroke-dashoffset:-16}}
+@media (prefers-reduced-motion:reduce){.spin,.flow{animation:none}}
+/* meters + cmds */
+.meters{display:grid;gap:16px}
+.mt{display:grid;grid-template-columns:130px 1fr 90px;gap:12px;align-items:center;font-size:15px}
+.bar{position:relative;height:22px;border-radius:11px;background:linear-gradient(90deg,var(--teal-soft) 0 var(--p),var(--coral-soft) var(--p) 100%);border:1px solid var(--line)}
+.bar i{position:absolute;top:-5px;bottom:-5px;left:var(--p);width:3px;background:var(--coral);border-radius:2px}
+.mt em{font-style:normal;font-weight:700;color:var(--coral)}
+.cmds{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.cmd{border:1px solid var(--line);border-left:6px solid var(--teal);border-radius:10px;padding:10px 14px;background:var(--bg)}
+.cmd.a{border-left-color:var(--amber)}.cmd.v{border-left-color:var(--violet)}.cmd.c{border-left-color:var(--coral)}
+.cmd code{font-size:18px;font-weight:700;background:none;padding:0;display:block;color:var(--ink)}
+.cmd span{font-size:14px;color:var(--muted)}
+@media (max-width:640px){.mt{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0L10,5L0,10z" style="fill:var(--muted)"/></marker>
+<marker id="arb" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" style="fill:var(--violet)"/></marker>
+</defs></svg>
+
+<div class="wrap">
+<h1>ESP32 ควบคุมรอบมอเตอร์</h1>
+<p class="lead">กระบวนการทำงานของ <code>motor_rpm_control_v2.ino</code> ตั้งแต่อ่านเซนเซอร์ คุมรอบแบบ PI ไปจนถึงส่งข้อมูลขึ้น MQTT และ Firebase</p>
+<div class="stats">
+<div class="stat"><b>100 ms</b><span>รอบการคุมมอเตอร์</span></div>
+<div class="stat"><b>20 kHz</b><span>ความถี่ PWM</span></div>
+<div class="stat"><b>4</b><span>เซนเซอร์</span></div>
+<div class="stat"><b>2 แกน</b><span>loop + Firebase task</span></div>
+</div>
+
+<section>
+<h2>1. ภาพรวมระบบ</h2>
+<p class="sub">เซนเซอร์ส่งค่าเข้า ESP32 → สั่งมอเตอร์ → ส่งข้อมูลออก และรับคำสั่งกลับทาง MQTT</p>
+<div class="scroll"><svg class="fig" viewBox="0 0 900 460" role="img" aria-label="ภาพรวมระบบ">
+<g>
+<rect class="tl" x="15" y="30" width="215" height="70" rx="12"/><text class="tx" x="30" y="60">Hall sensor</text><text class="sm" x="30" y="82">GPIO 27 · วัดรอบ</text>
+<rect class="tl" x="15" y="130" width="215" height="70" rx="12"/><text class="tx" x="30" y="160">DS18B20</text><text class="sm" x="30" y="182">GPIO 4 · อุณหภูมิ</text>
+<rect class="tl" x="15" y="230" width="215" height="70" rx="12"/><text class="tx" x="30" y="260">ADXL345</text><text class="sm" x="30" y="282">I²C · การสั่น X Y Z</text>
+<rect class="tl" x="15" y="330" width="215" height="70" rx="12"/><text class="tx" x="30" y="360">ACS712</text><text class="sm" x="30" y="382">GPIO 34 · กระแสไฟ</text>
+</g>
+<path class="ln" d="M230 65H300Q320 65 320 85V130"/><path class="ln" d="M230 165H330"/><path class="ln" d="M230 265H330"/><path class="ln" d="M230 365H300Q320 365 320 345V300"/>
+<g>
+<rect class="dk" x="335" y="100" width="230" height="260" rx="14"/>
+<g class="pin"><rect x="323" y="130" width="12" height="8"/><rect x="323" y="160" width="12" height="8"/><rect x="323" y="190" width="12" height="8"/><rect x="323" y="220" width="12" height="8"/><rect x="323" y="250" width="12" height="8"/><rect x="323" y="280" width="12" height="8"/><rect x="565" y="130" width="12" height="8"/><rect x="565" y="160" width="12" height="8"/><rect x="565" y="190" width="12" height="8"/><rect x="565" y="220" width="12" height="8"/><rect x="565" y="250" width="12" height="8"/><rect x="565" y="280" width="12" height="8"/></g>
+<text class="tx dtx mid" x="450" y="150" style="font-size:24px">ESP32</text>
+<text class="sm mid" x="450" y="190" style="fill:var(--chip-ink)">นับ pulse → คำนวณ RPM</text>
+<text class="sm mid" x="450" y="220" style="fill:var(--chip-ink)">ควบคุม PI + feedforward</text>
+<text class="sm mid" x="450" y="250" style="fill:var(--chip-ink)">รวมข้อมูลเป็น JSON</text>
+<text class="sm mid" x="450" y="280" style="fill:var(--chip-ink)">รับคำสั่ง MQTT / Serial</text>
+</g>
+<rect class="am" x="650" y="20" width="235" height="64" rx="12"/><text class="tx" x="665" y="48">ไดรเวอร์มอเตอร์</text><text class="sm" x="665" y="70">PWM ที่ EN · IN1=H, IN2=L</text>
+<path class="ln" d="M577 150Q620 150 650 60"/><path class="ln" d="M767 84V112"/>
+<g class="spin"><circle cx="767" cy="160" r="40" class="am"/><path d="M767 125V195M732 160H802M742 135L792 185M792 135L742 185" stroke="var(--amber)" stroke-width="3"/></g>
+<circle cx="767" cy="160" r="8" class="dk"/>
+<path class="ln dash flow" d="M727 160H620Q600 160 600 175V210" style="stroke:var(--teal);marker-end:none"/><text class="sm" x="620" y="200">แม่เหล็กผ่าน Hall (ป้อนกลับ)</text>
+<rect class="vi" x="650" y="250" width="235" height="56" rx="12"/><text class="tx" x="665" y="274">MQTT → Raspberry Pi</text><text class="sm" x="665" y="294">motor/sensors · motor/cmd</text>
+<rect class="vi" x="650" y="326" width="235" height="56" rx="12"/><text class="tx" x="665" y="350">Firebase Realtime DB</text><text class="sm" x="665" y="370">HTTP POST ทุก 1 วินาที</text>
+<rect class="bx" x="650" y="402" width="235" height="50" rx="12"/><text class="tx" x="665" y="424">Serial Monitor</text><text class="sm" x="665" y="443">สรุปค่า + เตือน ทุก 1 วินาที</text>
+<path class="ln2" d="M577 270Q610 270 650 278"/><path class="ln" d="M577 300Q610 300 650 354"/><path class="ln" d="M577 330Q610 330 650 427"/>
+</svg></div>
+</section>
+
+<section>
+<h2>2. ขั้นตอนตอนเปิดเครื่อง (setup)</h2>
+<p class="sub">มอเตอร์ยังไม่หมุนจนกว่าทุกอย่างพร้อม เพื่อให้ calibrate กระแสได้ถูกต้อง</p>
+<div class="scroll"><svg class="fig" viewBox="0 0 900 340" role="img" aria-label="ขั้นตอน setup">
+<g id="r1">
+<rect class="bx" x="10" y="20" width="200" height="120" rx="12"/><circle class="num" cx="35" cy="45" r="14"/><text class="numt" x="35" y="50">1</text><text class="tx" x="58" y="50">ตั้งขา Hall</text><text class="sm" x="22" y="84">INPUT_PULLUP</text><text class="sm" x="22" y="106">interrupt แบบ FALLING</text>
+<rect class="bx" x="235" y="20" width="200" height="120" rx="12"/><circle class="num" cx="260" cy="45" r="14"/><text class="numt" x="260" y="50">2</text><text class="tx" x="283" y="50">เตรียมมอเตอร์</text><text class="sm" x="247" y="84">PWM = 0 (ยังไม่หมุน)</text><text class="sm" x="247" y="106">ตั้งทิศไปข้างหน้า</text>
+<rect class="bx" x="460" y="20" width="200" height="120" rx="12"/><circle class="num" cx="485" cy="45" r="14"/><text class="numt" x="485" y="50">3</text><text class="tx" x="508" y="50">เริ่มเซนเซอร์</text><text class="sm" x="472" y="84">DS18B20 + ADXL345</text><text class="sm" x="472" y="106" style="fill:var(--coral)">ไม่เจอ ADXL345 = หยุดค้าง</text>
+<rect class="am" x="685" y="20" width="205" height="120" rx="12"/><circle class="num" cx="710" cy="45" r="14" style="fill:var(--amber)"/><text class="numt" x="710" y="50">4</text><text class="tx" x="733" y="50">Calibrate ACS712</text><text class="sm" x="697" y="84">เฉลี่ย 200 ครั้ง หา offset</text><text class="sm" x="697" y="106">ตอนไม่มีกระแส</text>
+</g>
+<path class="ln" d="M210 80H235"/><path class="ln" d="M435 80H460"/><path class="ln" d="M660 80H685"/>
+<path class="ln" d="M787 140V170Q787 185 770 185H120Q100 185 100 200V210" style="marker-end:url(#ar)"/>
+<g>
+<rect class="vi" x="10" y="210" width="200" height="120" rx="12"/><circle class="num" cx="35" cy="235" r="14" style="fill:var(--violet)"/><text class="numt" x="35" y="240">5</text><text class="tx" x="58" y="240">เชื่อม WiFi</text><text class="sm" x="22" y="274">รอสูงสุด 20 วินาที</text><text class="sm" x="22" y="296">ไม่ติดก็ลองใหม่ใน loop</text>
+<rect class="vi" x="235" y="210" width="200" height="120" rx="12"/><circle class="num" cx="260" cy="235" r="14" style="fill:var(--violet)"/><text class="numt" x="260" y="240">6</text><text class="tx" x="283" y="240">ซิงก์เวลา NTP</text><text class="sm" x="247" y="274">เขตเวลา UTC+7</text><text class="sm" x="247" y="296">รอสูงสุด 10 วินาที</text>
+<rect class="vi" x="460" y="210" width="200" height="120" rx="12"/><circle class="num" cx="485" cy="235" r="14" style="fill:var(--violet)"/><text class="numt" x="485" y="240">7</text><text class="tx" x="508" y="240">MQTT + Firebase</text><text class="sm" x="472" y="274">ตั้งค่า MQTT callback</text><text class="sm" x="472" y="296">สร้าง task บน core 0</text>
+<rect class="tl" x="685" y="210" width="205" height="120" rx="12"/><circle class="num" cx="710" cy="235" r="14"/><text class="numt" x="710" y="240">8</text><text class="tx" x="733" y="240">เริ่มคุมรอบ</text><text class="sm" x="697" y="274">เป้าหมายเริ่มต้น</text><text class="sm" x="697" y="296" style="font-weight:700;fill:var(--teal)">1000 RPM</text>
+</g>
+<path class="ln" d="M210 270H235"/><path class="ln" d="M435 270H460"/><path class="ln" d="M660 270H685"/>
+</svg></div>
+</section>
+
+<section>
+<h2>3. วงจรหลัก: งานแต่ละอย่างทำงานตามเวลา</h2>
+<p class="sub">แกนเวลา 1 วินาที (จุด 1 จุด = 1 ครั้งที่ทำงาน) loop เช็กด้วย <code>millis()</code> ไม่ใช้ delay</p>
+<div class="scroll"><svg class="fig" viewBox="0 0 900 300" role="img" aria-label="ไทม์ไลน์งานใน loop">
+<g stroke="var(--line)" stroke-width="1"><path d="M200 20V250M269 20V250M338 20V250M407 20V250M476 20V250M545 20V250M614 20V250M683 20V250M752 20V250M821 20V250M890 20V250"/></g>
+<text class="sm mid" x="200" y="270">0</text><text class="sm mid" x="545" y="270">500 ms</text><text class="sm mid" x="890" y="270">1000 ms</text>
+<text class="tx" x="10" y="52">อัปเดต RPM + คุม</text><text class="sm" x="10" y="70">ทุก 100 ms</text>
+<line x1="200" y1="58" x2="890" y2="58" stroke="var(--teal)" stroke-width="14" stroke-linecap="round" stroke-dasharray="0.1 69"/>
+<text class="tx" x="10" y="112">ส่ง MQTT + เซนเซอร์</text><text class="sm" x="10" y="130">ทุก 100 ms</text>
+<line x1="200" y1="118" x2="890" y2="118" stroke="var(--violet)" stroke-width="14" stroke-linecap="round" stroke-dasharray="0.1 69"/>
+<text class="tx" x="10" y="172">อุณหภูมิ DS18B20</text><text class="sm" x="10" y="190">สั่งวัด → รอ 800 ms → อ่าน</text>
+<line x1="200" y1="178" x2="752" y2="178" stroke="var(--amber)" stroke-width="3" stroke-dasharray="4 5"/>
+<circle cx="200" cy="178" r="8" fill="var(--amber)"/><circle cx="752" cy="178" r="8" fill="var(--amber)"/>
+<text class="sm mid" x="200" y="205">สั่งวัด</text><text class="sm mid" x="752" y="205">อ่านค่า</text>
+<text class="tx" x="10" y="232">Firebase + Serial</text><text class="sm" x="10" y="250">ทุก 1 วินาที</text>
+<circle cx="200" cy="232" r="8" fill="var(--coral)"/><circle cx="890" cy="232" r="8" fill="var(--coral)"/>
+</svg></div>
+<p class="sub" style="margin:8px 0 0">ทุกรอบของ loop ยังทำ: เช็ก WiFi (ลองใหม่ทุก 5 วินาที) · อ่านคำสั่ง Serial · เชื่อม MQTT ใหม่ทุก 2 วินาทีถ้าหลุด · <code>mqtt.loop()</code></p>
+</section>
+
+<section>
+<h2>4. การวัดรอบ (RPM)</h2>
+<p class="sub">วัดจากเวลาระหว่าง pulse แต่ละครั้ง จึงละเอียดแม้รอบต่ำ</p>
+<div class="scroll"><svg class="fig" viewBox="0 0 900 340" role="img" aria-label="การวัด RPM">
+<text class="sm" x="10" y="40">สัญญาณ Hall</text>
+<path class="wave" d="M20 60H120V130H150V60H340V130H370V60H560V130H590V60H700"/>
+<path class="wave dash" d="M700 60H880" style="stroke:var(--coral)"/>
+<path d="M120 55V30M340 55V30" stroke="var(--muted)" stroke-width="1.5"/>
+<path class="ln" d="M130 38H330" style="marker-start:url(#arb)"/><text class="tx mid" x="230" y="26">คาบ (period) µs</text>
+<path d="M240 60V90H258V60" fill="none" stroke="var(--coral)" stroke-width="3"/>
+<text class="sm mid" x="249" y="112" style="fill:var(--coral)">noise &lt; 5 ms ทิ้ง</text>
+<text class="sm mid" x="790" y="45" style="fill:var(--coral)">ไม่มี pulse &gt; 0.5 วินาที</text>
+<text class="tx mid" x="790" y="88" style="fill:var(--coral)">RPM = 0</text>
+<rect class="tl" x="10" y="160" width="270" height="150" rx="12"/><text class="tx" x="24" y="190">1) คำนวณค่าดิบ</text>
+<text class="sm" x="24" y="220">RPM = 60,000,000</text><text class="sm" x="24" y="242">      ÷ (คาบ µs × 3 แม่เหล็ก)</text><text class="sm" x="24" y="278">ถ้าเกิน 1.5× MAX_RPM_EST</text><text class="sm" x="24" y="298">ใช้ค่าเดิมแทน</text>
+<path class="ln" d="M280 235H310"/>
+<rect class="am" x="310" y="160" width="270" height="150" rx="12"/><text class="tx" x="324" y="190">2) กรองค่า</text>
+<text class="sm" x="324" y="220">rpm = 0.3 × ดิบ</text><text class="sm" x="324" y="242">    + 0.7 × ค่าเดิม</text><text class="sm" x="324" y="278">ลดอาการค่ากระโดด</text><text class="sm" x="324" y="298">ค่ายิ่งมาก ยิ่งไวแต่สั่นง่าย</text>
+<path class="ln" d="M580 235H610"/>
+<rect class="bx" x="610" y="160" width="280" height="150" rx="12"/><text class="tx" x="624" y="190">3) นำไปใช้</text>
+<text class="sm" x="624" y="220">เทียบกับเป้าหมาย → error</text><text class="sm" x="624" y="242">ส่งเข้าตัวควบคุม PI</text><text class="sm" x="624" y="278">ทุก 100 ms</text>
+</svg></div>
+</section>
+
+<section>
+<h2>5. ตัวควบคุมรอบแบบวงปิด</h2>
+<p class="sub">Feedforward ให้ค่าตั้งต้น แล้ว PI แก้ส่วนที่คลาดเคลื่อน รอบจริงถูกป้อนกลับมาเทียบทุก 100 ms</p>
+<div class="scroll"><svg class="fig" viewBox="0 0 900 320" role="img" aria-label="วงจรควบคุม PI">
+<rect class="tl" x="10" y="95" width="120" height="70" rx="12"/><text class="tx mid" x="70" y="125">เป้าหมาย</text><text class="sm mid" x="70" y="148">target RPM</text>
+<path class="ln" d="M130 130H178"/>
+<circle class="bx" cx="198" cy="130" r="20"/><text class="tx mid" x="198" y="137" style="font-size:22px">Σ</text><text class="sm" x="150" y="108">+</text><text class="sm" x="203" y="178">−</text>
+<path class="ln" d="M218 130H260"/><text class="sm" x="224" y="120">error</text>
+<rect class="am" x="260" y="60" width="240" height="140" rx="12"/><text class="tx" x="275" y="88">ตัวควบคุม</text>
+<text class="sm" x="275" y="116">Feedforward = เป้าหมาย ÷ MAX × 255</text><text class="sm" x="275" y="138">+ Kp × error  (Kp = 0.05)</text><text class="sm" x="275" y="160">+ Integral  (Ki = 0.10, ±100)</text><text class="sm" x="275" y="184" style="fill:var(--coral)">anti-windup กัน integral บวม</text>
+<path class="ln" d="M500 130H540"/>
+<rect class="bx" x="540" y="95" width="115" height="70" rx="12"/><text class="tx mid" x="597" y="122">จำกัด PWM</text><text class="sm mid" x="597" y="146">60 – 255</text>
+<path class="ln" d="M655 130H690"/>
+<rect class="am" x="690" y="95" width="200" height="70" rx="12"/><text class="tx" x="705" y="122">ไดรเวอร์ + มอเตอร์</text><text class="sm" x="705" y="146">ledcWrite(EN, pwm)</text>
+<path class="ln dash flow" d="M790 165V250H280" style="stroke:var(--teal);marker-end:none"/>
+<path class="ln" d="M280 250H198V152" style="stroke:var(--teal)"/>
+<rect class="tl" x="400" y="225" width="250" height="50" rx="10"/><text class="tx mid" x="525" y="255">Hall → RPM (ป้อนกลับ)</text>
+<g><rect class="co" x="10" y="215" width="170" height="80" rx="10"/><text class="tx" x="22" y="242">ข้อยกเว้น</text><text class="sm" x="22" y="264">เป้าหมาย ≤ 0 → PWM 0</text><text class="sm" x="22" y="283">โหมด pwm: → ข้ามการคุม</text></g>
+</svg></div>
+</section>
+
+<section>
+<h2>6. คำสั่งที่รับได้</h2>
+<p class="sub">ส่งได้ทาง MQTT (<code>motor/cmd</code>) และ Serial Monitor (line ending = Newline)</p>
+<div class="cmds">
+<div class="cmd"><code>rpm:1500</code><span>ตั้งรอบเป้าหมาย (พิมพ์ <code>1500</code> เฉย ๆ ก็ได้) · โหมดอัตโนมัติ</span></div>
+<div class="cmd c"><code>stop</code><span>หยุดมอเตอร์ ล้าง integral</span></div>
+<div class="cmd a"><code>pwm:150</code><span>โหมดแมนนวล สั่ง PWM 0–255 ตรง ๆ</span></div>
+<div class="cmd v"><code>kp:0.05</code><span>ปรับ Kp ขณะรัน</span></div>
+<div class="cmd v"><code>ki:0.10</code><span>ปรับ Ki ขณะรัน (ล้าง integral)</span></div>
+<div class="cmd v"><code>max:3000</code><span>ปรับรอบสูงสุดโดยประมาณ</span></div>
+<div class="cmd v"><code>minpwm:60</code><span>ปรับ PWM ต่ำสุดที่มอเตอร์ยังหมุน</span></div>
+</div>
+</section>
+
+<section>
+<h2>7. แบ่งงานสองแกนของ ESP32</h2>
+<p class="sub">Firebase ตอบช้า จึงแยกไปทำบน core 0 เพื่อไม่ให้การคุมมอเตอร์ช้าลง</p>
+<div class="scroll"><svg class="fig" viewBox="0 0 900 270" role="img" aria-label="การแบ่งงานสองแกน">
+<rect class="tl" x="10" y="20" width="300" height="230" rx="14"/><text class="tx" x="28" y="52" style="font-size:19px">Core 1 · loop หลัก</text>
+<text class="sm" x="28" y="90">• อ่านเซนเซอร์ทั้งหมด</text><text class="sm" x="28" y="120">• คุมมอเตอร์ด้วย PI</text><text class="sm" x="28" y="150">• ส่ง MQTT ทุก 100 ms</text><text class="sm" x="28" y="180">• ทุก 1 วินาที วาง JSON ลงบัฟเฟอร์</text><text class="sm" x="28" y="210">  (ถ้า mutex ว่างเท่านั้น)</text>
+<rect class="tl" x="590" y="20" width="300" height="230" rx="14"/><text class="tx" x="608" y="52" style="font-size:19px">Core 0 · FirebaseTask</text>
+<text class="sm" x="608" y="90">• ตรวจบัฟเฟอร์ทุก 200 ms</text><text class="sm" x="608" y="120">• มีข้อมูลใหม่ → คัดลอกออก</text><text class="sm" x="608" y="150">• HTTP POST ไป Firebase</text><text class="sm" x="608" y="180">• WiFi หลุด → ข้ามรอบนั้น</text>
+<rect class="vi" x="360" y="70" width="180" height="130" rx="14"/><text class="tx mid" x="450" y="108">บัฟเฟอร์ร่วม</text><text class="sm mid" x="450" y="132">firebasePayload</text>
+<rect x="430" y="150" width="40" height="30" rx="6" fill="var(--violet)"/><path d="M438 150V142Q438 128 450 128Q462 128 462 142V150" fill="none" stroke="var(--violet)" stroke-width="4"/><text class="sm mid" x="450" y="196" style="font-weight:700;fill:var(--violet)">mutex</text>
+<path class="ln" d="M310 135H360" style="stroke:var(--violet)"/><path class="ln" d="M540 135H590" style="stroke:var(--violet)"/>
+</svg></div>
+</section>
+
+<section>
+<h2>8. เกณฑ์แจ้งเตือน</h2>
+<p class="sub">ตรวจทุก 1 วินาทีและพิมพ์ทาง Serial เท่านั้น โปรแกรมไม่ได้หยุดมอเตอร์อัตโนมัติ</p>
+<div class="meters">
+<div class="mt"><b>อุณหภูมิ</b><div class="bar" style="--p:70%"><i></i></div><em>≥ 70 °C</em></div>
+<div class="mt"><b>กระแสไฟ</b><div class="bar" style="--p:80%"><i></i></div><em>≥ 4 A</em></div>
+<div class="mt"><b>แรงสั่นรวม √(x²+y²+z²)</b><div class="bar" style="--p:75%"><i></i></div><em>≥ 15</em></div>
+</div>
+</section>
+</div>
+</body>
+</html>
